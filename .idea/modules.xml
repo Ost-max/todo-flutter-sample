@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/flutter_sudy/todo_flutter_sample.iml" filepath="$PROJECT_DIR$/flutter_sudy/todo_flutter_sample.iml" />
+      <module fileurl="file://$PROJECT_DIR$/flutter_sudy.iml" filepath="$PROJECT_DIR$/flutter_sudy.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/flutter_sudy_android.iml" filepath="$PROJECT_DIR$/android/flutter_sudy_android.iml" />
     </modules>
   </component>
 </project>
