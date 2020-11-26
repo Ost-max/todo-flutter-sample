@@ -1,6 +1,8 @@
 class Item {
   final String id;
   String name;
+  String description;
+  DateTime before;
   bool done;
   bool enabled = true;
 

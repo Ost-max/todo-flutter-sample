@@ -36,7 +36,9 @@ class _TodoListWidgetState extends State<TodoListWidget> {
 
   void _addRow() {
     var item = Item((_counter++).toString(), '', false);
-    navigateToItem(item).then((value) => setState(() => _items.add(item)));
+    navigateToItem(item).then((value) => setState(() => {
+          if (item.name.isNotEmpty) {_items.add(item)}
+        }));
   }
 
   Widget _buildList() {
