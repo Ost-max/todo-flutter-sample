@@ -6,7 +6,6 @@ import 'item.dart';
 class TodoItemScreen extends StatelessWidget {
   static const routeName = '/item';
 
-
   @override
   Widget build(BuildContext context) {
     final Item item = ModalRoute.of(context).settings.arguments;
@@ -14,9 +13,9 @@ class TodoItemScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(item.name.isNotEmpty ? "Edit TODO Item" : "New TODO Item"),
       ),
-      body: Padding(
-          padding: EdgeInsets.all(24.0),
-          child: ToDoItemForm(item)
+      body: Theme(
+          data:  Theme.of(context).copyWith(inputDecorationTheme: InputDecorationTheme(border: InputBorder.none, filled: true )),
+          child: Padding(padding: EdgeInsets.all(24.0), child: ToDoItemForm(item))
       ),
     );
   }
@@ -33,7 +32,6 @@ class ToDoItemForm extends StatefulWidget {
   }
 }
 
-
 class ToDoItemFormState extends State<ToDoItemForm> {
   // Create a global key that uniquely identifies the Form widget
   // and allows validation of the form.
@@ -43,48 +41,55 @@ class ToDoItemFormState extends State<ToDoItemForm> {
   final _formKey = GlobalKey<FormState>();
   final Item _item;
 
-  static final titleCntlr = TextEditingController();
-  static final dateTimeCntlr = TextEditingController();
+  static final double _basicPadding = 24;
 
   ToDoItemFormState(this._item);
 
   @override
   Widget build(BuildContext context) {
     // Build a Form widget using the _formKey created above.
-    titleCntlr.text = _item.name;
 
     return Form(
         key: _formKey,
-        child: Column(
-            children: <Widget>[
-              TextField(
-                  decoration: InputDecoration(labelText: 'Title:'),
-                  controller: titleCntlr,
-                  onSubmitted: (val) => _item.name = val),
-              SizedBox(height: 16),
-              TextField(
-                controller: dateTimeCntlr,
-                decoration: InputDecoration(labelText: 'Due Date:'),
-                onSubmitted: (val) => _item.name = val,
-                onTap: (){
-                  showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(2025),
-                  ).then((value) =>  dateTimeCntlr.text = value.toString().split(' ')[0]);
-                } ,
-              ),
-
-              SizedBox(height: 16),
-              TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Description:',
-                  ),
-                  maxLines: 3,
-                  onSubmitted: (val) => _item.description = val)
-            ]
-        )
-    );
+        child: Column(children: <Widget>[
+          TextFormField(
+              decoration: InputDecoration(labelText: 'Title:'),
+              initialValue: _item.name,
+              onSaved: (val) => _item.name = val),
+          SizedBox(height: _basicPadding),
+          TextFormField(
+            onTap: () => showDatePicker(
+              context: context,
+              initialDate: _item.due ?? DateTime.now(),
+              firstDate: DateTime.now(),
+              lastDate: DateTime(2025),
+            ).then((value) => setState(() => _item.due = value)),
+            initialValue: _item.due != null ? _item.due.toString().split(' ')[0] : '',
+            decoration: InputDecoration(labelText: 'Due Date:', prefixIcon: Icon(Icons.calendar_today_outlined)),
+          ),
+          SizedBox(height: _basicPadding),
+          TextFormField(
+              decoration: InputDecoration( labelText: 'Description:'),
+              maxLines: 3,
+              onSaved: (val) => _item.description = val),
+          SizedBox(height: _basicPadding),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              OutlineButton(
+                  child: Text('Cancel'),
+                  onPressed: () => Navigator.pop(context)),
+              SizedBox(width: _basicPadding),
+              ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState.validate()) {
+                      _formKey.currentState.save();
+                      Navigator.pop(context, _item);
+                    }
+                  },
+                  child: Text('Apply')),
+            ],
+          )
+        ]));
   }
 }

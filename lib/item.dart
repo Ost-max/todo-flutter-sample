@@ -2,7 +2,7 @@ class Item {
   final String id;
   String name;
   String description;
-  DateTime before;
+  DateTime due;
   bool done;
   bool enabled = true;
 
