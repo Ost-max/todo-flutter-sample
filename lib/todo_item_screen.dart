@@ -8,15 +8,18 @@ class TodoItemScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Item item = ModalRoute.of(context).settings.arguments;
+    final Item item =
+        ModalRoute.of(context).settings.arguments ?? new Item('0', '', false);
     return Scaffold(
       appBar: AppBar(
         title: Text(item.name.isNotEmpty ? "Edit TODO Item" : "New TODO Item"),
       ),
       body: Theme(
-          data:  Theme.of(context).copyWith(inputDecorationTheme: InputDecorationTheme(border: InputBorder.none, filled: true )),
-          child: Padding(padding: EdgeInsets.all(24.0), child: ToDoItemForm(item))
-      ),
+          data: Theme.of(context).copyWith(
+              inputDecorationTheme:
+                  InputDecorationTheme(border: InputBorder.none, filled: true)),
+          child: Padding(
+              padding: EdgeInsets.all(24.0), child: ToDoItemForm(item))),
     );
   }
 }
@@ -42,8 +45,15 @@ class ToDoItemFormState extends State<ToDoItemForm> {
   final Item _item;
 
   static final double _basicPadding = 24;
+  static final TextEditingController _controllerDate = TextEditingController();
 
   ToDoItemFormState(this._item);
+
+  @override
+  void initState() {
+    super.initState();
+    _controllerDate.text = _formatDate(_item.due);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +63,10 @@ class ToDoItemFormState extends State<ToDoItemForm> {
         key: _formKey,
         child: Column(children: <Widget>[
           TextFormField(
-              decoration: InputDecoration(labelText: 'Title:'),
+              decoration: InputDecoration(
+                labelText: 'Title:',
+                prefixIcon: Icon(Icons.done),
+              ),
               initialValue: _item.name,
               onSaved: (val) => _item.name = val),
           SizedBox(height: _basicPadding),
@@ -63,13 +76,23 @@ class ToDoItemFormState extends State<ToDoItemForm> {
               initialDate: _item.due ?? DateTime.now(),
               firstDate: DateTime.now(),
               lastDate: DateTime(2025),
-            ).then((value) => setState(() => _item.due = value)),
-            initialValue: _item.due != null ? _item.due.toString().split(' ')[0] : '',
-            decoration: InputDecoration(labelText: 'Due Date:', prefixIcon: Icon(Icons.calendar_today_outlined)),
+            ).then((value) => setState(() {
+                  _controllerDate.text = _formatDate(value);
+                  _item.due = value;
+                })),
+            controller: _controllerDate,
+            readOnly: true,
+            decoration: InputDecoration(
+              prefixIcon: Icon(Icons.calendar_today_outlined),
+              labelText: 'Due Date:',
+            ),
           ),
           SizedBox(height: _basicPadding),
           TextFormField(
-              decoration: InputDecoration( labelText: 'Description:'),
+              decoration: InputDecoration(
+                labelText: 'Description:',
+                prefixIcon: Icon(Icons.description),
+              ),
               maxLines: 3,
               onSaved: (val) => _item.description = val),
           SizedBox(height: _basicPadding),
@@ -79,7 +102,7 @@ class ToDoItemFormState extends State<ToDoItemForm> {
               OutlineButton(
                   child: Text('Cancel'),
                   onPressed: () => Navigator.pop(context)),
-              SizedBox(width: _basicPadding),
+              SizedBox(width: 12),
               ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
@@ -91,5 +114,9 @@ class ToDoItemFormState extends State<ToDoItemForm> {
             ],
           )
         ]));
+  }
+
+  String _formatDate(DateTime due) {
+    return due != null ? due.toString().split(' ')[0] : '';
   }
 }

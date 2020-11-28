@@ -35,8 +35,7 @@ class _TodoListWidgetState extends State<TodoListWidget> {
   }
 
   void _addRow() {
-    var item = Item((_counter++).toString(), '', false);
-    navigateToItem(item).then((value) => setState(() {
+    navigateToItem(null).then((value) => setState(() {
           if (value != null) {
             _items.add(value);
           }
@@ -53,7 +52,7 @@ class _TodoListWidgetState extends State<TodoListWidget> {
   Widget _buildRow(Item item) {
     return ListTile(
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
         Checkbox(
             value: item.done,
             onChanged: (bool newValue) => setState(() {
@@ -68,8 +67,9 @@ class _TodoListWidgetState extends State<TodoListWidget> {
                     .merge(_biggerFont)
                 : _biggerFont,
           ),
-        )
+        ),
       ]),
+      Divider(thickness: 1)
     ]));
   }
 }
