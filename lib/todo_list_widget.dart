@@ -44,32 +44,80 @@ class _TodoListWidgetState extends State<TodoListWidget> {
 
   Widget _buildList() {
     return ListView.builder(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(8.0),
         itemCount: _items.length,
-        itemBuilder: (context, i) => _buildRow(_items[i]));
+        itemBuilder: (context, i) => _buildRow(_items[i], i));
   }
 
-  Widget _buildRow(Item item) {
-    return ListTile(
-        title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        Checkbox(
-            value: item.done,
-            onChanged: (bool newValue) => setState(() {
-                  item.done = newValue;
-                })),
-        GestureDetector(
-          onTap: () => navigateToItem(item).then((value) => setState(() => {})),
-          child: Text(
-            item.name,
-            style: item.done
-                ? TextStyle(decoration: TextDecoration.lineThrough)
-                    .merge(_biggerFont)
-                : _biggerFont,
-          ),
+  Widget _buildRow(Item item, int i) {
+    return Dismissible(
+      key: Key(item.name),
+      background: Container(
+        color: Colors.red,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        alignment: AlignmentDirectional.centerStart,
+        child: Icon(
+          Icons.delete,
+          color: Colors.white,
         ),
-      ]),
-      Divider(thickness: 1)
-    ]));
+      ),
+      secondaryBackground: Container(
+        color: Colors.lightGreen,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        alignment: AlignmentDirectional.centerEnd,
+        child: Icon(
+          Icons.done_outline_rounded,
+          color: Colors.white,
+        ),
+      ),
+      dismissThresholds: {
+        DismissDirection.startToEnd: 0.7,
+        DismissDirection.endToStart: 0.2
+      },
+      confirmDismiss: (direction) {
+        var delete = direction == DismissDirection.startToEnd;
+        setState(() {
+          if (!delete) {
+            item.done = !item.done;
+          }
+        });
+        return Future.value(delete);
+      },
+      onDismissed: (direction) {
+        setState(() {
+          print(direction);
+          _items.removeAt(i);
+        });
+      },
+      child: Card(
+        child: ListTile(
+            subtitle: Text(
+              '${item.getDueDateFormatted().isNotEmpty ? item.getDueDateFormatted() : item.description}',
+              overflow: TextOverflow.ellipsis,
+            ),
+            leading: Checkbox(
+                value: item.done,
+                onChanged: (bool newValue) => setState(() {
+                      item.done = newValue;
+                    })),
+            trailing: IconButton(
+              icon: Icon(Icons.edit),
+              onPressed: () =>
+                  navigateToItem(item).then((value) => setState(() => {})),
+            ),
+            title: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    item.name,
+                    style: item.done
+                        ? TextStyle(decoration: TextDecoration.lineThrough)
+                            .merge(_biggerFont)
+                        : _biggerFont,
+                  ),
+                ])),
+      ),
+    );
   }
 }

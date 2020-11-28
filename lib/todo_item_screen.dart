@@ -52,7 +52,7 @@ class ToDoItemFormState extends State<ToDoItemForm> {
   @override
   void initState() {
     super.initState();
-    _controllerDate.text = _formatDate(_item.due);
+    _controllerDate.text = _item.getDueDateFormatted();
   }
 
   @override
@@ -77,8 +77,8 @@ class ToDoItemFormState extends State<ToDoItemForm> {
               firstDate: DateTime.now(),
               lastDate: DateTime(2025),
             ).then((value) => setState(() {
-                  _controllerDate.text = _formatDate(value);
                   _item.due = value;
+                  _controllerDate.text = _item.getDueDateFormatted();
                 })),
             controller: _controllerDate,
             readOnly: true,
@@ -89,6 +89,7 @@ class ToDoItemFormState extends State<ToDoItemForm> {
           ),
           SizedBox(height: _basicPadding),
           TextFormField(
+              initialValue: _item.description,
               decoration: InputDecoration(
                 labelText: 'Description:',
                 prefixIcon: Icon(Icons.description),
